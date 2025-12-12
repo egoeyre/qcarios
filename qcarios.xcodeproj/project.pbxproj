@@ -6,6 +6,16 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		019169D72EEBC8010056A9FB /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 019169D62EEBC8010056A9FB /* Auth */; };
+		019169D92EEBC8010056A9FB /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 019169D82EEBC8010056A9FB /* Functions */; };
+		019169DB2EEBC8010056A9FB /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 019169DA2EEBC8010056A9FB /* PostgREST */; };
+		019169DD2EEBC8010056A9FB /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 019169DC2EEBC8010056A9FB /* Realtime */; };
+		019169DF2EEBC8010056A9FB /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 019169DE2EEBC8010056A9FB /* Storage */; };
+		019169E12EEBC8010056A9FB /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 019169E02EEBC8010056A9FB /* Supabase */; };
+		CE8AE99A4A40D24FE2E43C09 /* libPods-qcarios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BEF75AC8D51332CE3342D609 /* libPods-qcarios.a */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		019169B82EEBC7BF0056A9FB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,21 +37,30 @@
 		019169A82EEBC7BE0056A9FB /* qcarios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = qcarios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		019169B72EEBC7BF0056A9FB /* qcariosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = qcariosTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		019169C12EEBC7BF0056A9FB /* qcariosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = qcariosUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0323BFB26EF88BB10C7B796B /* Pods-qcarios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-qcarios.debug.xcconfig"; path = "Target Support Files/Pods-qcarios/Pods-qcarios.debug.xcconfig"; sourceTree = "<group>"; };
+		374D54C4E2AEBB3AA26BBABD /* Pods-qcarios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-qcarios.release.xcconfig"; path = "Target Support Files/Pods-qcarios/Pods-qcarios.release.xcconfig"; sourceTree = "<group>"; };
+		BEF75AC8D51332CE3342D609 /* libPods-qcarios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-qcarios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		019169AA2EEBC7BE0056A9FB /* qcarios */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = qcarios;
 			sourceTree = "<group>";
 		};
 		019169BA2EEBC7BF0056A9FB /* qcariosTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = qcariosTests;
 			sourceTree = "<group>";
 		};
 		019169C42EEBC7BF0056A9FB /* qcariosUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = qcariosUITests;
 			sourceTree = "<group>";
 		};
@@ -52,6 +71,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				019169DB2EEBC8010056A9FB /* PostgREST in Frameworks */,
+				019169D92EEBC8010056A9FB /* Functions in Frameworks */,
+				019169E12EEBC8010056A9FB /* Supabase in Frameworks */,
+				019169D72EEBC8010056A9FB /* Auth in Frameworks */,
+				019169DF2EEBC8010056A9FB /* Storage in Frameworks */,
+				019169DD2EEBC8010056A9FB /* Realtime in Frameworks */,
+				CE8AE99A4A40D24FE2E43C09 /* libPods-qcarios.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,7 +104,9 @@
 				019169AA2EEBC7BE0056A9FB /* qcarios */,
 				019169BA2EEBC7BF0056A9FB /* qcariosTests */,
 				019169C42EEBC7BF0056A9FB /* qcariosUITests */,
+				019169D52EEBC8010056A9FB /* Frameworks */,
 				019169A92EEBC7BE0056A9FB /* Products */,
+				67323C665ECFB9BF73525A02 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -92,6 +120,24 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		019169D52EEBC8010056A9FB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				BEF75AC8D51332CE3342D609 /* libPods-qcarios.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		67323C665ECFB9BF73525A02 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				0323BFB26EF88BB10C7B796B /* Pods-qcarios.debug.xcconfig */,
+				374D54C4E2AEBB3AA26BBABD /* Pods-qcarios.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -99,9 +145,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 019169CB2EEBC7BF0056A9FB /* Build configuration list for PBXNativeTarget "qcarios" */;
 			buildPhases = (
+				BAE9BDDCF40D8531289BFCD2 /* [CP] Check Pods Manifest.lock */,
 				019169A42EEBC7BE0056A9FB /* Sources */,
 				019169A52EEBC7BE0056A9FB /* Frameworks */,
 				019169A62EEBC7BE0056A9FB /* Resources */,
+				3C3FF6A1798D160B7FB9862D /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -112,6 +160,12 @@
 			);
 			name = qcarios;
 			packageProductDependencies = (
+				019169D62EEBC8010056A9FB /* Auth */,
+				019169D82EEBC8010056A9FB /* Functions */,
+				019169DA2EEBC8010056A9FB /* PostgREST */,
+				019169DC2EEBC8010056A9FB /* Realtime */,
+				019169DE2EEBC8010056A9FB /* Storage */,
+				019169E02EEBC8010056A9FB /* Supabase */,
 			);
 			productName = qcarios;
 			productReference = 019169A82EEBC7BE0056A9FB /* qcarios.app */;
@@ -134,8 +188,6 @@
 				019169BA2EEBC7BF0056A9FB /* qcariosTests */,
 			);
 			name = qcariosTests;
-			packageProductDependencies = (
-			);
 			productName = qcariosTests;
 			productReference = 019169B72EEBC7BF0056A9FB /* qcariosTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -157,8 +209,6 @@
 				019169C42EEBC7BF0056A9FB /* qcariosUITests */,
 			);
 			name = qcariosUITests;
-			packageProductDependencies = (
-			);
 			productName = qcariosUITests;
 			productReference = 019169C12EEBC7BF0056A9FB /* qcariosUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
@@ -195,6 +245,9 @@
 			);
 			mainGroup = 0191699F2EEBC7BE0056A9FB;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				019169D42EEBC7F10056A9FB /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 019169A92EEBC7BE0056A9FB /* Products */;
 			projectDirPath = "";
@@ -230,6 +283,48 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		3C3FF6A1798D160B7FB9862D /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-qcarios/Pods-qcarios-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-qcarios/Pods-qcarios-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-qcarios/Pods-qcarios-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BAE9BDDCF40D8531289BFCD2 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-qcarios-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		019169A42EEBC7BE0056A9FB /* Sources */ = {
@@ -392,6 +487,7 @@
 		};
 		019169CC2EEBC7BF0056A9FB /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0323BFB26EF88BB10C7B796B /* Pods-qcarios.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -424,6 +520,7 @@
 		};
 		019169CD2EEBC7BF0056A9FB /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 374D54C4E2AEBB3AA26BBABD /* Pods-qcarios.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -578,6 +675,50 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		019169D42EEBC7F10056A9FB /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase-community/supabase-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		019169D62EEBC8010056A9FB /* Auth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 019169D42EEBC7F10056A9FB /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Auth;
+		};
+		019169D82EEBC8010056A9FB /* Functions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 019169D42EEBC7F10056A9FB /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Functions;
+		};
+		019169DA2EEBC8010056A9FB /* PostgREST */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 019169D42EEBC7F10056A9FB /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = PostgREST;
+		};
+		019169DC2EEBC8010056A9FB /* Realtime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 019169D42EEBC7F10056A9FB /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Realtime;
+		};
+		019169DE2EEBC8010056A9FB /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 019169D42EEBC7F10056A9FB /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Storage;
+		};
+		019169E02EEBC8010056A9FB /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 019169D42EEBC7F10056A9FB /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 019169A02EEBC7BE0056A9FB /* Project object */;
 }
