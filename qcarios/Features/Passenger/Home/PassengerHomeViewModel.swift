@@ -27,6 +27,12 @@ final class PassengerHomeViewModel: ObservableObject {
     @Published var isCreatingOrder = false
     @Published var showRouteInfo = false
 
+    // 活跃订单相关
+    @Published var activeOrder: Order?
+    @Published var showActiveOrderAlert = false
+    @Published var showOrderDetail = false
+    @Published var alertMessage = ""
+
     // MARK: - Dependencies
 
     private let locationService = LocationService.shared
@@ -38,6 +44,9 @@ final class PassengerHomeViewModel: ObservableObject {
 
     init() {
         setupBindings()
+        Task {
+            await checkActiveOrder()
+        }
     }
 
     // MARK: - Setup
@@ -107,6 +116,18 @@ final class PassengerHomeViewModel: ObservableObject {
 
         Task {
             do {
+                // 先检查是否有活跃订单
+                await checkActiveOrder()
+
+                if activeOrder != nil {
+                    // 有活跃订单,显示提示并导航到订单详情
+                    alertMessage = "您有正在进行的订单，请先完成或取消该订单"
+                    showActiveOrderAlert = true
+                    isCreatingOrder = false
+                    return
+                }
+
+                // 创建新订单
                 let request = CreateOrderRequest(
                     passengerId: userId,
                     orderType: .immediate,
@@ -128,13 +149,51 @@ final class PassengerHomeViewModel: ObservableObject {
 
                 print("✅ 订单创建成功: \(order.orderNumber)")
 
-                // TODO: 导航到订单详情页
+                // 设置为活跃订单并导航到详情页
+                activeOrder = order
+                showOrderDetail = true
 
             } catch {
                 print("❌ 创建订单失败: \(error)")
+                alertMessage = "创建订单失败: \(error.localizedDescription)"
+                showActiveOrderAlert = true
             }
 
             isCreatingOrder = false
+        }
+    }
+
+    /// 检查是否有活跃订单
+    func checkActiveOrder() async {
+        guard let userId = AuthService.shared.currentUser?.id else {
+            return
+        }
+
+        do {
+            // 查询用户的所有订单
+            let orders = try await orderRepository.getOrdersByPassenger(
+                passengerId: userId,
+                status: nil
+            )
+
+            // 找到第一个活跃订单（未完成且未取消）
+            activeOrder = orders.first { order in
+                order.isActive // pending, accepted, driverArrived, inProgress
+            }
+
+            if activeOrder != nil {
+                print("📋 找到活跃订单: \(activeOrder!.orderNumber)")
+            }
+
+        } catch {
+            print("❌ 检查活跃订单失败: \(error)")
+        }
+    }
+
+    /// 查看活跃订单
+    func viewActiveOrder() {
+        if activeOrder != nil {
+            showOrderDetail = true
         }
     }
 

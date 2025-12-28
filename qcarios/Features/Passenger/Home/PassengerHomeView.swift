@@ -14,43 +14,63 @@ struct PassengerHomeView: View {
     @State private var showLocationPicker = false
 
     var body: some View {
-        ZStack {
-            // 地图
-            MapView(
-                centerCoordinate: $viewModel.mapCenter,
-                userLocation: $viewModel.currentLocation,
-                annotations: viewModel.annotations,
-                polyline: viewModel.routePolyline,
-                showsUserLocation: true
-            )
-            .ignoresSafeArea()
+        NavigationView {
+            ZStack {
+                // 地图
+                MapView(
+                    centerCoordinate: $viewModel.mapCenter,
+                    userLocation: $viewModel.currentLocation,
+                    annotations: viewModel.annotations,
+                    polyline: viewModel.routePolyline,
+                    showsUserLocation: true
+                )
+                .ignoresSafeArea()
 
-            // UI覆盖层
-            VStack {
-                // 顶部搜索栏
-                searchBar
+                // UI覆盖层
+                VStack {
+                    // 顶部搜索栏
+                    searchBar
 
-                Spacer()
+                    Spacer()
 
-                // 底部卡片
-                if viewModel.showRouteInfo {
-                    routeInfoCard
-                } else {
-                    quickActionCard
+                    // 底部卡片
+                    if viewModel.showRouteInfo {
+                        routeInfoCard
+                    } else {
+                        quickActionCard
+                    }
                 }
+
+                // 导航到订单详情
+                NavigationLink(
+                    destination: viewModel.activeOrder.map { OrderDetailView(order: $0) },
+                    isActive: $viewModel.showOrderDetail
+                ) {
+                    EmptyView()
+                }
+                .hidden()
             }
-        }
-        .sheet(isPresented: $showLocationPicker) {
-            LocationPickerView(
-                selectedLocation: $viewModel.selectedDestination,
-                onConfirm: {
-                    showLocationPicker = false
-                    viewModel.calculateRoute()
+            .navigationBarHidden(true)
+            .sheet(isPresented: $showLocationPicker) {
+                LocationPickerView(
+                    selectedLocation: $viewModel.selectedDestination,
+                    onConfirm: {
+                        showLocationPicker = false
+                        viewModel.calculateRoute()
+                    }
+                )
+            }
+            .alert("提示", isPresented: $viewModel.showActiveOrderAlert) {
+                Button("查看订单", role: .none) {
+                    viewModel.viewActiveOrder()
                 }
-            )
-        }
-        .onAppear {
-            viewModel.requestLocationPermission()
+                Button("取消", role: .cancel) {}
+            } message: {
+                Text(viewModel.alertMessage)
+            }
+            .onAppear {
+                viewModel.requestLocationPermission()
+            }
         }
     }
 
