@@ -335,6 +335,18 @@ struct ProfileView: View {
                     .padding(.vertical)
                 }
 
+                // 角色切换器
+                Section {
+                    RoleSwitcher()
+                        .padding(.vertical, 4)
+                } header: {
+                    if AuthService.shared.currentUser?.isDriver == true {
+                        Text("模式切换")
+                    } else {
+                        Text("司机服务")
+                    }
+                }
+
                 Section("账户信息") {
                     NavigationLink("个人资料") {
                         Text("个人资料")
