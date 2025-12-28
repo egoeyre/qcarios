@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct PaymentView: View {
 
@@ -204,7 +205,7 @@ struct PaymentMethodRow: View {
 }
 
 // MARK: - Payment Method Extension
-extension PaymentMethod: CaseIterable {}
+// extension PaymentMethod: CaseIterable {}
 
 // MARK: - ViewModel
 @MainActor

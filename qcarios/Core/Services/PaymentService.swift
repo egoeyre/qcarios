@@ -9,7 +9,7 @@ import Foundation
 import Supabase
 
 // MARK: - Payment Method
-enum PaymentMethod: String, Codable {
+enum PaymentMethod: String, Codable, CaseIterable {
     case wechat = "wechat"
     case alipay = "alipay"
     case balance = "balance"
@@ -99,7 +99,7 @@ final class PaymentService: PaymentServiceProtocol {
 
     static let shared = PaymentService()
 
-    private let client = SupabaseClient.shared.client
+    private let client = SupabaseClientWrapper.shared.client
 
     // MARK: - Initialization
 
@@ -121,15 +121,18 @@ final class PaymentService: PaymentServiceProtocol {
             "status": PaymentStatus.pending.rawValue
         ]
 
-        let response = try await client.database
+        let paymentJson = try JSONSerialization.data(withJSONObject: paymentData)
+
+        // 根据官方文档，直接使用 client.from() 而不是 client.database.from()
+        let payment: Payment = try await client
             .from(SupabaseConfig.Table.payments)
-            .insert(paymentData)
+            .insert(paymentJson)
             .select()
             .single()
             .execute()
+            .value
 
-        guard let paymentId = try? response.decode() as Payment,
-              let id = paymentId.id else {
+        guard let id = payment.id else {
             throw PaymentError.networkError
         }
 
@@ -162,16 +165,13 @@ final class PaymentService: PaymentServiceProtocol {
 
     /// 查询支付状态
     func queryPaymentStatus(paymentId: UUID) async throws -> PaymentStatus {
-        let response = try await client.database
+        let payment: Payment = try await client
             .from(SupabaseConfig.Table.payments)
             .select("status")
             .eq("id", value: paymentId.uuidString)
             .single()
             .execute()
-
-        guard let payment = try? response.decode() as Payment else {
-            throw PaymentError.networkError
-        }
+            .value
 
         return payment.status
     }
@@ -287,9 +287,11 @@ final class PaymentService: PaymentServiceProtocol {
             updates["paid_at"] = ISO8601DateFormatter().string(from: Date())
         }
 
-        _ = try await client.database
+        let jsonData = try JSONSerialization.data(withJSONObject: updates)
+
+        _ = try await client
             .from(SupabaseConfig.Table.payments)
-            .update(updates)
+            .update(jsonData)
             .eq("id", value: paymentId.uuidString)
             .execute()
     }

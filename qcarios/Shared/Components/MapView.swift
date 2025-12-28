@@ -7,7 +7,8 @@
 
 import SwiftUI
 import UIKit
-import MAMapKit
+import AMapNaviKit
+import CoreLocation
 
 // MARK: - Map View
 struct MapView: UIViewRepresentable {
@@ -133,8 +134,8 @@ struct MapView: UIViewRepresentable {
         func mapView(_ mapView: MAMapView!, rendererFor overlay: MAOverlay!) -> MAOverlayRenderer! {
             if overlay is MAPolyline {
                 let renderer = MAPolylineRenderer(overlay: overlay)
-                renderer.lineWidth = 6
-                renderer.strokeColor = UIColor.systemBlue.withAlphaComponent(0.7)
+                renderer!.lineWidth = 6
+                renderer!.strokeColor = UIColor.systemBlue.withAlphaComponent(0.7)
                 return renderer
             }
             return nil

@@ -90,8 +90,30 @@ extension LocationService: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
 
-        currentLocation = location
-        locationSubject.send(location)
+        // 将 WGS-84 坐标转换为 GCJ-02（高德地图坐标系）
+        let wgsCoordinate = location.coordinate
+        let gcjCoordinate = CoordinateConverter.wgs84ToGcj02(wgsCoordinate)
+
+        // 创建使用 GCJ-02 坐标的 CLLocation 对象
+        let convertedLocation = CLLocation(
+            coordinate: gcjCoordinate,
+            altitude: location.altitude,
+            horizontalAccuracy: location.horizontalAccuracy,
+            verticalAccuracy: location.verticalAccuracy,
+            timestamp: location.timestamp
+        )
+
+        #if DEBUG
+        print("📍 位置更新:")
+        print("   [WGS-84] 经度: \(wgsCoordinate.longitude), 纬度: \(wgsCoordinate.latitude)")
+        print("   [GCJ-02] 经度: \(gcjCoordinate.longitude), 纬度: \(gcjCoordinate.latitude)")
+        print("   偏移: Δ经度: \(gcjCoordinate.longitude - wgsCoordinate.longitude), Δ纬度: \(gcjCoordinate.latitude - wgsCoordinate.latitude)")
+        print("   精度: \(location.horizontalAccuracy)m")
+        print("   时间: \(location.timestamp)")
+        #endif
+
+        currentLocation = convertedLocation
+        locationSubject.send(convertedLocation)
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {

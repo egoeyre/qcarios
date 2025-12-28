@@ -8,6 +8,7 @@
 import Foundation
 import CoreLocation
 import Combine
+import Supabase
 
 @MainActor
 final class PassengerHomeViewModel: ObservableObject {
@@ -193,25 +194,24 @@ final class PassengerHomeViewModel: ObservableObject {
     private func calculatePrice(route: RouteInfo) async {
         // 使用Supabase RPC函数计算价格
         do {
-            let client = SupabaseClient.shared.client
+            let client = SupabaseClientWrapper.shared.client
 
-            let params: [String: Any] = [
-                "p_city_code": "BJ", // TODO: 根据位置获取城市代码
-                "p_service_type": "standard",
-                "p_distance_km": route.distanceKm,
-                "p_duration_min": route.durationMinutes,
-                "p_order_time": ISO8601DateFormatter().string(from: Date())
-            ]
+            // 根据官方文档，params 必须是 Encodable 类型
+            let params = CalculateOrderPriceParams(
+                p_city_code: "BJ", // TODO: 根据位置获取城市代码
+                p_service_type: "standard",
+                p_distance_km: route.distanceKm,
+                p_duration_min: route.durationMinutes,
+                p_order_time: ISO8601DateFormatter().string(from: Date())
+            )
 
-            let response = try await client.database
-                .rpc("calculate_order_price", params: params)
+            // 根据官方文档，直接使用 client.rpc() 而不是 client.database.rpc()
+            let price: Double = try await client
+                .rpc(SupabaseConfig.RPC.calculateOrderPrice, params: params)
                 .execute()
+                .value
 
-            // 解析价格
-            if let data = response.data,
-               let price = try? JSONDecoder().decode(Double.self, from: data) {
-                self.estimatedPrice = price
-            }
+            self.estimatedPrice = price
 
         } catch {
             print("❌ 计算价格失败: \(error)")

@@ -22,35 +22,39 @@ protocol DriverRepositoryProtocol {
 final class DriverRepository: DriverRepositoryProtocol {
 
     // MARK: - Properties
-    private let client = SupabaseClient.shared.client
+    private let client = SupabaseClientWrapper.shared.client
     private let tableName = SupabaseConfig.Table.driverProfiles
     private let trackingTableName = SupabaseConfig.Table.locationTracking
 
     // MARK: - Read Operations
 
     func getDriverProfile(userId: UUID) async throws -> DriverProfile {
-        let response = try await client.database
+        let response: DriverProfile = try await client
             .from(tableName)
             .select()
             .eq("user_id", value: userId.uuidString)
             .single()
             .execute()
+            .value
 
-        return try response.decode()
+        return response
     }
 
     // MARK: - Update Operations
 
     func updateDriverProfile(id: UUID, updates: [String: Any]) async throws -> DriverProfile {
-        let response = try await client.database
+        let jsonData = try JSONSerialization.data(withJSONObject: updates)
+
+        let response: DriverProfile = try await client
             .from(tableName)
-            .update(updates)
+            .update(jsonData)
             .eq("id", value: id.uuidString)
             .select()
             .single()
             .execute()
+            .value
 
-        return try response.decode()
+        return response
     }
 
     func updateOnlineStatus(userId: UUID, status: DriverOnlineStatus) async throws -> DriverProfile {
@@ -58,15 +62,18 @@ final class DriverRepository: DriverRepositoryProtocol {
             "online_status": status.rawValue
         ]
 
-        let response = try await client.database
+        let jsonData = try JSONSerialization.data(withJSONObject: updates)
+
+        let response: DriverProfile = try await client
             .from(tableName)
-            .update(updates)
+            .update(jsonData)
             .eq("user_id", value: userId.uuidString)
             .select()
             .single()
             .execute()
+            .value
 
-        return try response.decode()
+        return response
     }
 
     func updateDriverLocation(userId: UUID, location: CLLocation) async throws -> DriverProfile {
@@ -76,33 +83,39 @@ final class DriverRepository: DriverRepositoryProtocol {
             "last_location_update": ISO8601DateFormatter().string(from: Date())
         ]
 
-        let response = try await client.database
+        let jsonData = try JSONSerialization.data(withJSONObject: updates)
+
+        let response: DriverProfile = try await client
             .from(tableName)
-            .update(updates)
+            .update(jsonData)
             .eq("user_id", value: userId.uuidString)
             .select()
             .single()
             .execute()
+            .value
 
-        return try response.decode()
+        return response
     }
 
     // MARK: - Search Operations
 
     func findNearbyDrivers(location: Location, radiusKm: Decimal = 5, limit: Int = 10) async throws -> [NearbyDriver] {
         // 使用数据库函数查找附近司机
-        let params: [String: Any] = [
-            "p_lat": location.latitude,
-            "p_lng": location.longitude,
-            "p_radius_km": NSDecimalNumber(decimal: radiusKm).doubleValue,
-            "p_limit": limit
-        ]
+        // 根据官方文档，params 必须是 Encodable 类型
+        // 创建一个符合 Encodable 的参数对象
+        let params = FindNearbyDriversParams(
+            p_lat: location.latitude,
+            p_lng: location.longitude,
+            p_radius_km: NSDecimalNumber(decimal: radiusKm).doubleValue,
+            p_limit: limit
+        )
 
-        let response = try await client.database
+        let response: [NearbyDriver] = try await client
             .rpc(SupabaseConfig.RPC.findNearbyDrivers, params: params)
             .execute()
+            .value
 
-        return try response.decode()
+        return response
     }
 
     // MARK: - Location Tracking
@@ -115,15 +128,17 @@ final class DriverRepository: DriverRepositoryProtocol {
             "driver_id": driverId.uuidString,
             "lat": locationUpdate.latitude,
             "lng": locationUpdate.longitude,
-            "accuracy": locationUpdate.accuracy.map { NSDecimalNumber(decimal: $0).doubleValue },
-            "speed": locationUpdate.speed.map { NSDecimalNumber(decimal: $0).doubleValue },
-            "bearing": locationUpdate.bearing.map { NSDecimalNumber(decimal: $0).doubleValue },
+            "accuracy": locationUpdate.accuracy.map { NSDecimalNumber(decimal: $0).doubleValue }!,
+            "speed": locationUpdate.speed.map { NSDecimalNumber(decimal: $0).doubleValue }!,
+            "bearing": locationUpdate.bearing.map { NSDecimalNumber(decimal: $0).doubleValue }!,
             "timestamp": ISO8601DateFormatter().string(from: locationUpdate.timestamp)
         ]
 
-        _ = try await client.database
+        let jsonData = try JSONSerialization.data(withJSONObject: record)
+
+        _ = try await client
             .from(trackingTableName)
-            .insert(record)
+            .insert(jsonData)
             .execute()
 
         // 同时更新司机profile中的位置
@@ -131,14 +146,15 @@ final class DriverRepository: DriverRepositoryProtocol {
     }
 
     func getOrderTrack(orderId: UUID) async throws -> [DriverLocationUpdate] {
-        let response = try await client.database
+        let response: [DriverLocationUpdate] = try await client
             .from(trackingTableName)
             .select()
             .eq("order_id", value: orderId.uuidString)
             .order("timestamp", ascending: true)
             .execute()
+            .value
 
-        return try response.decode()
+        return response
     }
 }
 

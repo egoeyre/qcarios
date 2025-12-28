@@ -89,24 +89,37 @@ final class LoginViewModel: ObservableObject {
 
     /// 验证验证码并登录
     func verifyAndLogin() async -> Bool {
-        guard canVerify else { return false }
+        guard canVerify else {
+            print("❌ 验证失败: canVerify = false")
+            return false
+        }
+
+        print("🔐 开始验证登录...")
+        print("📱 手机号: \(phoneNumber)")
+        print("🔢 验证码: \(verificationCode)")
 
         isLoading = true
         errorMessage = nil
 
         do {
+            print("🔄 调用 authService.verifyCode...")
             let user = try await authService.verifyCode(verificationCode, phone: phoneNumber)
 
             // 登录成功
             print("✅ 登录成功: \(user.displayName)")
+            print("👤 用户ID: \(user.id)")
+            print("📞 用户手机: \(user.phone)")
+
+            isLoading = false
             return true
 
         } catch {
+            print("❌ 验证失败: \(error)")
+            print("❌ 错误详情: \(error.localizedDescription)")
             errorMessage = error.localizedDescription
+            isLoading = false
             return false
         }
-
-        isLoading = false
     }
 
     /// 清除错误消息

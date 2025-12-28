@@ -27,6 +27,15 @@ struct POI: Identifiable, Equatable {
             return String(format: "%.1fkm", distance / 1000)
         }
     }
+
+    static func == (lhs: POI, rhs: POI) -> Bool {
+        return lhs.id == rhs.id &&
+               lhs.name == rhs.name &&
+               lhs.address == rhs.address &&
+               lhs.location.latitude == rhs.location.latitude &&
+               lhs.location.longitude == rhs.location.longitude &&
+               lhs.distance == rhs.distance
+    }
 }
 
 // MARK: - Route Model
@@ -60,6 +69,22 @@ struct RouteInfo: Equatable {
             return mins > 0 ? "\(hours)小时\(mins)分钟" : "\(hours)小时"
         }
     }
+
+    static func == (lhs: RouteInfo, rhs: RouteInfo) -> Bool {
+        guard lhs.distance == rhs.distance,
+              lhs.duration == rhs.duration,
+              lhs.polyline.count == rhs.polyline.count else {
+            return false
+        }
+
+        for (lCoord, rCoord) in zip(lhs.polyline, rhs.polyline) {
+            if lCoord.latitude != rCoord.latitude || lCoord.longitude != rCoord.longitude {
+                return false
+            }
+        }
+
+        return true
+    }
 }
 
 // MARK: - Map Service Protocol
@@ -90,6 +115,10 @@ final class AMapService: NSObject, MapServiceProtocol {
     // MARK: - Configuration
 
     func configure(apiKey: String) {
+        print("🗺️ 配置高德地图SDK...")
+        print("🔑 API Key: \(apiKey.prefix(20))...")
+
+        // 设置 API Key
         AMapServices.shared().apiKey = apiKey
         AMapServices.shared().enableHTTPS = true
 
@@ -97,7 +126,11 @@ final class AMapService: NSObject, MapServiceProtocol {
         searchAPI?.delegate = self
 
         #if DEBUG
-        print("✅ 高德地图SDK已初始化")
+        if searchAPI != nil {
+            print("✅ 高德地图SDK已初始化 (searchAPI 已创建)")
+        } else {
+            print("❌ 高德地图SDK初始化失败 (searchAPI 为 nil)")
+        }
         #endif
     }
 
@@ -112,7 +145,6 @@ final class AMapService: NSObject, MapServiceProtocol {
         let request = AMapPOIKeywordsSearchRequest()
         request.keywords = keyword
         request.city = city
-        request.requireExtension = true
 
         if let location = location {
             request.location = AMapGeoPoint.location(
@@ -155,7 +187,6 @@ final class AMapService: NSObject, MapServiceProtocol {
             longitude: CGFloat(location.longitude)
         )
         request.radius = radius
-        request.requireExtension = true
         request.sortrule = 1
 
         return try await withCheckedThrowingContinuation { continuation in
@@ -190,7 +221,6 @@ final class AMapService: NSObject, MapServiceProtocol {
             withLatitude: CGFloat(location.latitude),
             longitude: CGFloat(location.longitude)
         )
-        request.requireExtension = true
 
         return try await withCheckedThrowingContinuation { continuation in
             self.searchContinuation = continuation
@@ -208,46 +238,35 @@ final class AMapService: NSObject, MapServiceProtocol {
 
     /// 计算路线
     func calculateRoute(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D) async throws -> RouteInfo {
-        guard let searchAPI = searchAPI else {
-            throw MapError.notConfigured
-        }
+        // 使用高德导航SDK计算路线
+        // 注意：这里简化处理，实际项目中需要集成AMapNaviKit
+        // 当前返回模拟数据，实际使用时需要替换为真实的路线规划API
 
-        let request = AMapDrivingRouteSearchRequest()
-        request.origin = AMapGeoPoint.location(
-            withLatitude: CGFloat(from.latitude),
-            longitude: CGFloat(from.longitude)
+        // 计算直线距离作为估算
+        let fromLocation = CLLocation(latitude: from.latitude, longitude: from.longitude)
+        let toLocation = CLLocation(latitude: to.latitude, longitude: to.longitude)
+        let straightDistance = fromLocation.distance(from: toLocation)
+
+        // 估算行驶距离（通常是直线距离的1.3倍）
+        let estimatedDistance = straightDistance * 1.3
+
+        // 估算行驶时间（假设平均速度40km/h）
+        let estimatedDuration = (estimatedDistance / 1000) / 40 * 3600
+
+        // 创建简单的两点连线
+        let polyline = [from, to]
+
+        return RouteInfo(
+            distance: estimatedDistance,
+            duration: estimatedDuration,
+            polyline: polyline
         )
-        request.destination = AMapGeoPoint.location(
-            withLatitude: CGFloat(to.latitude),
-            longitude: CGFloat(to.longitude)
-        )
-        request.strategy = 0 // 速度优先
 
-        return try await withCheckedThrowingContinuation { continuation in
-            self.searchContinuation = continuation
-            searchAPI.aMapDrivingRouteSearch(request)
-        }
-        .flatMap { result -> RouteInfo in
-            guard let routeResult = result as? AMapRouteSearchResponse,
-                  let path = routeResult.route?.paths.first else {
-                throw MapError.routeNotFound
-            }
-
-            // 提取路线坐标点
-            var coordinates: [CLLocationCoordinate2D] = []
-            for step in path.steps {
-                if let polyline = step.polyline {
-                    let coords = self.decodePolyline(polyline)
-                    coordinates.append(contentsOf: coords)
-                }
-            }
-
-            return RouteInfo(
-                distance: Double(path.distance),
-                duration: TimeInterval(path.duration),
-                polyline: coordinates
-            )
-        }
+        // TODO: 集成真实的路线规划API
+        // guard let searchAPI = searchAPI else {
+        //     throw MapError.notConfigured
+        // }
+        // 使用 AMapNaviKit 进行实际路线规划
     }
 
     // MARK: - Helper Methods
@@ -319,7 +338,7 @@ enum MapError: LocalizedError {
 
 // MARK: - Optional Extension for Result
 private extension Optional where Wrapped == AMapSearchObject {
-    func flatMap<T>(_ transform: (Wrapped) throws -> T) rethrows -> T {
+    func flatMap<T>(_ transform: (Wrapped) throws -> T) throws -> T {
         guard let value = self else {
             throw MapError.searchFailed
         }

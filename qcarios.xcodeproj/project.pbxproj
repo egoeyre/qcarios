@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		019169D72EEBC8010056A9FB /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 019169D62EEBC8010056A9FB /* Auth */; };
-		019169D92EEBC8010056A9FB /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 019169D82EEBC8010056A9FB /* Functions */; };
-		019169DB2EEBC8010056A9FB /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 019169DA2EEBC8010056A9FB /* PostgREST */; };
-		019169DD2EEBC8010056A9FB /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 019169DC2EEBC8010056A9FB /* Realtime */; };
-		019169DF2EEBC8010056A9FB /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 019169DE2EEBC8010056A9FB /* Storage */; };
-		019169E12EEBC8010056A9FB /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 019169E02EEBC8010056A9FB /* Supabase */; };
+		0134325A2EFE8CC500D0D481 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 013432592EFE8CC500D0D481 /* Auth */; };
+		0134325C2EFE8CC500D0D481 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 0134325B2EFE8CC500D0D481 /* Functions */; };
+		0134325E2EFE8CC500D0D481 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 0134325D2EFE8CC500D0D481 /* PostgREST */; };
+		013432602EFE8CC500D0D481 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 0134325F2EFE8CC500D0D481 /* Realtime */; };
+		013432622EFE8CC500D0D481 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 013432612EFE8CC500D0D481 /* Storage */; };
+		013432642EFE8CC500D0D481 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 013432632EFE8CC500D0D481 /* Supabase */; };
 		CE8AE99A4A40D24FE2E43C09 /* libPods-qcarios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BEF75AC8D51332CE3342D609 /* libPods-qcarios.a */; };
 /* End PBXBuildFile section */
 
@@ -42,25 +42,32 @@
 		BEF75AC8D51332CE3342D609 /* libPods-qcarios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-qcarios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		01916ADC2EEC05250056A9FB /* Exceptions for "qcarios" folder in "qcarios" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 019169A72EEBC7BE0056A9FB /* qcarios */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		019169AA2EEBC7BE0056A9FB /* qcarios */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				01916ADC2EEC05250056A9FB /* Exceptions for "qcarios" folder in "qcarios" target */,
 			);
 			path = qcarios;
 			sourceTree = "<group>";
 		};
 		019169BA2EEBC7BF0056A9FB /* qcariosTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = qcariosTests;
 			sourceTree = "<group>";
 		};
 		019169C42EEBC7BF0056A9FB /* qcariosUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = qcariosUITests;
 			sourceTree = "<group>";
 		};
@@ -71,12 +78,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				019169DB2EEBC8010056A9FB /* PostgREST in Frameworks */,
-				019169D92EEBC8010056A9FB /* Functions in Frameworks */,
-				019169E12EEBC8010056A9FB /* Supabase in Frameworks */,
-				019169D72EEBC8010056A9FB /* Auth in Frameworks */,
-				019169DF2EEBC8010056A9FB /* Storage in Frameworks */,
-				019169DD2EEBC8010056A9FB /* Realtime in Frameworks */,
+				013432642EFE8CC500D0D481 /* Supabase in Frameworks */,
+				013432622EFE8CC500D0D481 /* Storage in Frameworks */,
+				0134325E2EFE8CC500D0D481 /* PostgREST in Frameworks */,
+				0134325C2EFE8CC500D0D481 /* Functions in Frameworks */,
+				0134325A2EFE8CC500D0D481 /* Auth in Frameworks */,
+				013432602EFE8CC500D0D481 /* Realtime in Frameworks */,
 				CE8AE99A4A40D24FE2E43C09 /* libPods-qcarios.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -134,7 +141,6 @@
 				0323BFB26EF88BB10C7B796B /* Pods-qcarios.debug.xcconfig */,
 				374D54C4E2AEBB3AA26BBABD /* Pods-qcarios.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -160,12 +166,12 @@
 			);
 			name = qcarios;
 			packageProductDependencies = (
-				019169D62EEBC8010056A9FB /* Auth */,
-				019169D82EEBC8010056A9FB /* Functions */,
-				019169DA2EEBC8010056A9FB /* PostgREST */,
-				019169DC2EEBC8010056A9FB /* Realtime */,
-				019169DE2EEBC8010056A9FB /* Storage */,
-				019169E02EEBC8010056A9FB /* Supabase */,
+				013432592EFE8CC500D0D481 /* Auth */,
+				0134325B2EFE8CC500D0D481 /* Functions */,
+				0134325D2EFE8CC500D0D481 /* PostgREST */,
+				0134325F2EFE8CC500D0D481 /* Realtime */,
+				013432612EFE8CC500D0D481 /* Storage */,
+				013432632EFE8CC500D0D481 /* Supabase */,
 			);
 			productName = qcarios;
 			productReference = 019169A82EEBC7BE0056A9FB /* qcarios.app */;
@@ -246,7 +252,7 @@
 			mainGroup = 0191699F2EEBC7BE0056A9FB;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				019169D42EEBC7F10056A9FB /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				013432582EFE8CBC00D0D481 /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 019169A92EEBC7BE0056A9FB /* Products */;
@@ -293,9 +299,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-qcarios/Pods-qcarios-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-qcarios/Pods-qcarios-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -495,7 +505,14 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = J7HNKXAB7G;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = qcarios/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_NSCameraUsageDescription = "需要使用相机拍摄证件照片";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "需要持续获取位置以追踪行程";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "需要获取您的位置信息以提供代驾服务";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "需要访问相册选择图片";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -528,7 +545,14 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = J7HNKXAB7G;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = qcarios/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_NSCameraUsageDescription = "需要使用相机拍摄证件照片";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "需要持续获取位置以追踪行程";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "需要获取您的位置信息以提供代驾服务";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "需要访问相册选择图片";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -677,7 +701,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		019169D42EEBC7F10056A9FB /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+		013432582EFE8CBC00D0D481 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/supabase-community/supabase-swift.git";
 			requirement = {
@@ -688,34 +712,34 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		019169D62EEBC8010056A9FB /* Auth */ = {
+		013432592EFE8CC500D0D481 /* Auth */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 019169D42EEBC7F10056A9FB /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = 013432582EFE8CBC00D0D481 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Auth;
 		};
-		019169D82EEBC8010056A9FB /* Functions */ = {
+		0134325B2EFE8CC500D0D481 /* Functions */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 019169D42EEBC7F10056A9FB /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = 013432582EFE8CBC00D0D481 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Functions;
 		};
-		019169DA2EEBC8010056A9FB /* PostgREST */ = {
+		0134325D2EFE8CC500D0D481 /* PostgREST */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 019169D42EEBC7F10056A9FB /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = 013432582EFE8CBC00D0D481 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = PostgREST;
 		};
-		019169DC2EEBC8010056A9FB /* Realtime */ = {
+		0134325F2EFE8CC500D0D481 /* Realtime */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 019169D42EEBC7F10056A9FB /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = 013432582EFE8CBC00D0D481 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Realtime;
 		};
-		019169DE2EEBC8010056A9FB /* Storage */ = {
+		013432612EFE8CC500D0D481 /* Storage */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 019169D42EEBC7F10056A9FB /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = 013432582EFE8CBC00D0D481 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Storage;
 		};
-		019169E02EEBC8010056A9FB /* Supabase */ = {
+		013432632EFE8CC500D0D481 /* Supabase */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 019169D42EEBC7F10056A9FB /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = 013432582EFE8CBC00D0D481 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Supabase;
 		};
 /* End XCSwiftPackageProductDependency section */

@@ -7,6 +7,8 @@
 
 import SwiftUI
 import AMapFoundationKit
+import AMapNaviKit
+import Combine
 
 @main
 struct qcariosApp: App {
@@ -22,6 +24,10 @@ struct qcariosApp: App {
     }
 
     private func configureServices() {
+        // 配置高德地图隐私合规（必须在 MAMapView 实例化之前调用）
+        MAMapView.updatePrivacyShow(.didShow, privacyInfo: .didContain)
+        MAMapView.updatePrivacyAgree(.didAgree)
+
         // 验证Supabase配置
         let validation = SupabaseConfig.detailedValidation()
         if !validation.isValid {

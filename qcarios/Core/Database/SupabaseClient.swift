@@ -8,11 +8,11 @@
 import Foundation
 import Supabase
 
-/// Supabase客户端单例
-final class SupabaseClient {
+/// Supabase客户端单例包装器
+final class SupabaseClientWrapper {
 
     // MARK: - Singleton
-    static let shared = SupabaseClient()
+    static let shared = SupabaseClientWrapper()
 
     // MARK: - Properties
     let client: SupabaseClient
@@ -26,23 +26,17 @@ final class SupabaseClient {
             fatalError("Supabase configuration not found in Info.plist")
         }
 
-        // 初始化Supabase客户端
+        // 初始化Supabase客户端 (根据官方文档)
         self.client = SupabaseClient(
             supabaseURL: url,
             supabaseKey: supabaseKey,
             options: SupabaseClientOptions(
-                db: SupabaseClientOptions.DatabaseOptions(
-                    schema: "public"
+                db: .init(schema: "public"),
+                auth: .init(
+                    flowType: .pkce  // 使用PKCE流程提高安全性
                 ),
-                auth: SupabaseClientOptions.AuthOptions(
-                    autoRefreshToken: true,
-                    persistSession: true,
-                    detectSessionInUrl: false
-                ),
-                global: SupabaseClientOptions.GlobalOptions(
-                    headers: [
-                        "X-Client-Info": "qcarios-ios"
-                    ]
+                global: .init(
+                    headers: ["x-client-info": "qcarios-ios"]
                 )
             )
         )
@@ -55,9 +49,9 @@ final class SupabaseClient {
     // MARK: - Convenience Accessors
 
     /// 数据库访问
-    var database: PostgrestClient {
-        client.database
-    }
+//    var database: PostgrestClient {
+//        client.database
+//    }
 
     /// 认证服务
     var auth: AuthClient {
@@ -69,29 +63,26 @@ final class SupabaseClient {
         client.realtime
     }
 
-    /// 存储服务
-    var storage: StorageClient {
-        client.storage
-    }
+    /// 存储服务 (需要时可以通过 client.storage 访问)
+    // var storage: StorageClient {
+    //     client.storage
+    // }
 
     // MARK: - Helper Methods
 
-    /// 获取当前用户ID
-    var currentUserId: UUID? {
-        guard let user = try? auth.session.user else {
-            return nil
-        }
-        return user.id
+    /// 获取当前用户ID (异步方法，因为 session 是异步属性)
+    func getCurrentUserId() async -> UUID? {
+        return try? await auth.session.user.id
     }
 
-    /// 检查是否已登录
-    var isAuthenticated: Bool {
-        return currentUserId != nil
+    /// 检查是否已登录 (异步方法，因为 session 是异步属性)
+    func checkAuthentication() async -> Bool {
+        return (try? await auth.session) != nil
     }
 }
 
 // MARK: - Environment Configuration
-extension SupabaseClient {
+extension SupabaseClientWrapper {
 
     /// 环境配置
     enum Environment {
@@ -121,7 +112,7 @@ extension SupabaseClient {
 }
 
 // MARK: - Error Handling
-extension SupabaseClient {
+extension SupabaseClientWrapper {
 
     enum DatabaseError: LocalizedError {
         case notAuthenticated

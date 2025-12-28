@@ -18,52 +18,62 @@ protocol UserRepositoryProtocol {
 final class UserRepository: UserRepositoryProtocol {
 
     // MARK: - Properties
-    private let client = SupabaseClient.shared.client
+    private let client = SupabaseClientWrapper.shared.client
     private let tableName = SupabaseConfig.Table.users
 
     // MARK: - Read Operations
 
     func getUser(id: UUID) async throws -> User {
-        let response = try await client.database
+        let response: User = try await client
             .from(tableName)
             .select()
             .eq("id", value: id.uuidString)
             .single()
             .execute()
+            .value
 
-        return try response.decode()
+        return response
     }
 
     func getCurrentUser() async throws -> User {
-        guard let userId = SupabaseClient.shared.currentUserId else {
-            throw SupabaseClient.DatabaseError.notAuthenticated
+        guard let userId = await SupabaseClientWrapper.shared.getCurrentUserId() else {
+            throw SupabaseClientWrapper.DatabaseError.notAuthenticated
         }
 
         return try await getUser(id: userId)
     }
 
     func getUserByPhone(phone: String) async throws -> User? {
-        let response = try await client.database
-            .from(tableName)
-            .select()
-            .eq("phone", value: phone)
-            .maybeSingle()
-            .execute()
+        do {
+            let response: User = try await client
+                .from(tableName)
+                .select()
+                .eq("phone", value: phone)
+                .single()
+                .execute()
+                .value
 
-        return try? response.decode()
+            return response
+        } catch {
+            // If no user found, return nil
+            return nil
+        }
     }
 
     // MARK: - Update Operations
 
     func updateUser(id: UUID, updates: [String: Any]) async throws -> User {
-        let response = try await client.database
+        let jsonData = try JSONSerialization.data(withJSONObject: updates)
+
+        let response: User = try await client
             .from(tableName)
-            .update(updates)
+            .update(jsonData)
             .eq("id", value: id.uuidString)
             .select()
             .single()
             .execute()
+            .value
 
-        return try response.decode()
+        return response
     }
 }

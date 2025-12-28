@@ -8,6 +8,7 @@
 import Foundation
 import Supabase
 import Combine
+import CoreLocation
 
 protocol OrderRepositoryProtocol {
     func createOrder(_ request: CreateOrderRequest) async throws -> Order
@@ -25,74 +26,91 @@ protocol OrderRepositoryProtocol {
 final class OrderRepository: OrderRepositoryProtocol {
 
     // MARK: - Properties
-    private let client = SupabaseClient.shared.client
+    private let client = SupabaseClientWrapper.shared.client
     private let tableName = SupabaseConfig.Table.orders
 
     // MARK: - Create Order
 
     func createOrder(_ request: CreateOrderRequest) async throws -> Order {
-        let response = try await client.database
+        let response: Order = try await client
             .from(tableName)
             .insert(request)
             .select()
             .single()
             .execute()
+            .value
 
-        return try response.decode()
+        return response
     }
 
     // MARK: - Read Operations
 
     func getOrder(id: UUID) async throws -> Order {
-        let response = try await client.database
+        let response: Order = try await client
             .from(tableName)
             .select()
             .eq("id", value: id.uuidString)
             .single()
             .execute()
+            .value
 
-        return try response.decode()
+        return response
     }
 
     func getOrdersByPassenger(passengerId: UUID, status: OrderStatus? = nil) async throws -> [Order] {
-        var query = client.database
-            .from(tableName)
-            .select()
-            .eq("passenger_id", value: passengerId.uuidString)
-            .order("created_at", ascending: false)
-
         if let status = status {
-            query = query.eq("status", value: status.rawValue)
+            let response: [Order] = try await client
+                .from(tableName)
+                .select()
+                .eq("passenger_id", value: passengerId.uuidString)
+                .eq("status", value: status.rawValue)
+                .order("created_at", ascending: false)
+                .execute()
+                .value
+            return response
+        } else {
+            let response: [Order] = try await client
+                .from(tableName)
+                .select()
+                .eq("passenger_id", value: passengerId.uuidString)
+                .order("created_at", ascending: false)
+                .execute()
+                .value
+            return response
         }
-
-        let response = try await query.execute()
-        return try response.decode()
     }
 
     func getOrdersByDriver(driverId: UUID, status: OrderStatus? = nil) async throws -> [Order] {
-        var query = client.database
-            .from(tableName)
-            .select()
-            .eq("driver_id", value: driverId.uuidString)
-            .order("created_at", ascending: false)
-
         if let status = status {
-            query = query.eq("status", value: status.rawValue)
+            let response: [Order] = try await client
+                .from(tableName)
+                .select()
+                .eq("driver_id", value: driverId.uuidString)
+                .eq("status", value: status.rawValue)
+                .order("created_at", ascending: false)
+                .execute()
+                .value
+            return response
+        } else {
+            let response: [Order] = try await client
+                .from(tableName)
+                .select()
+                .eq("driver_id", value: driverId.uuidString)
+                .order("created_at", ascending: false)
+                .execute()
+                .value
+            return response
         }
-
-        let response = try await query.execute()
-        return try response.decode()
     }
 
     func getPendingOrders(near location: Location, radiusKm: Decimal = 5) async throws -> [Order] {
         // 使用PostGIS查询附近的待接单订单
-        let response = try await client.database
+        let allOrders: [Order] = try await client
             .from(tableName)
             .select()
             .eq("status", value: OrderStatus.pending.rawValue)
             .execute()
-
-        let allOrders: [Order] = try response.decode()
+            .value
 
         // 客户端过滤（也可以用RPC函数在数据库端过滤）
         return allOrders.filter { order in
@@ -125,15 +143,18 @@ final class OrderRepository: OrderRepositoryProtocol {
             break
         }
 
-        let response = try await client.database
+        let jsonData = try JSONSerialization.data(withJSONObject: updates)
+
+        let response: Order = try await client
             .from(tableName)
-            .update(updates)
+            .update(jsonData)
             .eq("id", value: id.uuidString)
             .select()
             .single()
             .execute()
+            .value
 
-        return try response.decode()
+        return response
     }
 
     func acceptOrder(id: UUID, driverId: UUID) async throws -> Order {
@@ -143,16 +164,19 @@ final class OrderRepository: OrderRepositoryProtocol {
             "accepted_at": ISO8601DateFormatter().string(from: Date())
         ]
 
-        let response = try await client.database
+        let jsonData = try JSONSerialization.data(withJSONObject: updates)
+
+        let response: Order = try await client
             .from(tableName)
-            .update(updates)
+            .update(jsonData)
             .eq("id", value: id.uuidString)
             .eq("status", value: OrderStatus.pending.rawValue) // 只能接待接单状态的订单
             .select()
             .single()
             .execute()
+            .value
 
-        return try response.decode()
+        return response
     }
 
     func cancelOrder(id: UUID, cancelledBy: UUID, reason: String? = nil) async throws -> Order {
@@ -166,15 +190,18 @@ final class OrderRepository: OrderRepositoryProtocol {
             updates["cancel_reason"] = reason
         }
 
-        let response = try await client.database
+        let jsonData = try JSONSerialization.data(withJSONObject: updates)
+
+        let response: Order = try await client
             .from(tableName)
-            .update(updates)
+            .update(jsonData)
             .eq("id", value: id.uuidString)
             .select()
             .single()
             .execute()
+            .value
 
-        return try response.decode()
+        return response
     }
 
     func updateOrderPrice(id: UUID, finalPrice: Decimal, actualDistance: Decimal, actualDuration: Int) async throws -> Order {
@@ -184,15 +211,18 @@ final class OrderRepository: OrderRepositoryProtocol {
             "actual_duration_min": actualDuration
         ]
 
-        let response = try await client.database
+        let jsonData = try JSONSerialization.data(withJSONObject: updates)
+
+        let response: Order = try await client
             .from(tableName)
-            .update(updates)
+            .update(jsonData)
             .eq("id", value: id.uuidString)
             .select()
             .single()
             .execute()
+            .value
 
-        return try response.decode()
+        return response
     }
 
     // MARK: - Realtime Subscription
