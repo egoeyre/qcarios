@@ -11,7 +11,7 @@ import CoreLocation
 
 protocol DriverRepositoryProtocol {
     func getDriverProfile(userId: UUID) async throws -> DriverProfile
-    func updateDriverProfile(id: UUID, updates: [String: Any]) async throws -> DriverProfile
+    func updateDriverProfile<T: Encodable>(id: UUID, updates: T) async throws -> DriverProfile
     func updateOnlineStatus(userId: UUID, status: DriverOnlineStatus) async throws -> DriverProfile
     func updateDriverLocation(userId: UUID, location: CLLocation) async throws -> DriverProfile
     func findNearbyDrivers(location: Location, radiusKm: Decimal, limit: Int) async throws -> [NearbyDriver]
@@ -42,59 +42,81 @@ final class DriverRepository: DriverRepositoryProtocol {
 
     // MARK: - Update Operations
 
-    func updateDriverProfile(id: UUID, updates: [String: Any]) async throws -> DriverProfile {
-        let jsonData = try JSONSerialization.data(withJSONObject: updates)
-
-        let response: DriverProfile = try await client
+    func updateDriverProfile<T: Encodable>(id: UUID, updates: T) async throws -> DriverProfile {
+        // 使用数组响应以便更好地处理错误
+        let response: [DriverProfile] = try await client
             .from(tableName)
-            .update(jsonData)
+            .update(updates)
             .eq("id", value: id.uuidString)
             .select()
-            .single()
             .execute()
             .value
 
-        return response
+        guard let profile = response.first else {
+            throw SupabaseClientWrapper.DatabaseError.invalidResponse
+        }
+
+        return profile
     }
 
     func updateOnlineStatus(userId: UUID, status: DriverOnlineStatus) async throws -> DriverProfile {
-        let updates: [String: Any] = [
-            "online_status": status.rawValue
-        ]
+        struct OnlineStatusUpdate: Encodable {
+            let onlineStatus: String
 
-        let jsonData = try JSONSerialization.data(withJSONObject: updates)
+            enum CodingKeys: String, CodingKey {
+                case onlineStatus = "online_status"
+            }
+        }
 
-        let response: DriverProfile = try await client
+        let updates = OnlineStatusUpdate(onlineStatus: status.rawValue)
+
+        let response: [DriverProfile] = try await client
             .from(tableName)
-            .update(jsonData)
+            .update(updates)
             .eq("user_id", value: userId.uuidString)
             .select()
-            .single()
             .execute()
             .value
 
-        return response
+        guard let profile = response.first else {
+            throw SupabaseClientWrapper.DatabaseError.invalidResponse
+        }
+
+        return profile
     }
 
     func updateDriverLocation(userId: UUID, location: CLLocation) async throws -> DriverProfile {
-        let updates: [String: Any] = [
-            "current_lat": location.coordinate.latitude,
-            "current_lng": location.coordinate.longitude,
-            "last_location_update": ISO8601DateFormatter().string(from: Date())
-        ]
+        struct LocationUpdate: Encodable {
+            let currentLat: Double
+            let currentLng: Double
+            let lastLocationUpdate: String
 
-        let jsonData = try JSONSerialization.data(withJSONObject: updates)
+            enum CodingKeys: String, CodingKey {
+                case currentLat = "current_lat"
+                case currentLng = "current_lng"
+                case lastLocationUpdate = "last_location_update"
+            }
+        }
 
-        let response: DriverProfile = try await client
+        let updates = LocationUpdate(
+            currentLat: location.coordinate.latitude,
+            currentLng: location.coordinate.longitude,
+            lastLocationUpdate: ISO8601DateFormatter().string(from: Date())
+        )
+
+        let response: [DriverProfile] = try await client
             .from(tableName)
-            .update(jsonData)
+            .update(updates)
             .eq("user_id", value: userId.uuidString)
             .select()
-            .single()
             .execute()
             .value
 
-        return response
+        guard let profile = response.first else {
+            throw SupabaseClientWrapper.DatabaseError.invalidResponse
+        }
+
+        return profile
     }
 
     // MARK: - Search Operations
@@ -121,24 +143,44 @@ final class DriverRepository: DriverRepositoryProtocol {
     // MARK: - Location Tracking
 
     func trackLocation(orderId: UUID, driverId: UUID, location: CLLocation) async throws {
+        struct LocationTrackingInsert: Encodable {
+            let orderId: String
+            let driverId: String
+            let lat: Double
+            let lng: Double
+            let accuracy: Double?
+            let speed: Double?
+            let bearing: Double?
+            let timestamp: String
+
+            enum CodingKeys: String, CodingKey {
+                case orderId = "order_id"
+                case driverId = "driver_id"
+                case lat
+                case lng
+                case accuracy
+                case speed
+                case bearing
+                case timestamp
+            }
+        }
+
         let locationUpdate = DriverLocationUpdate(driverId: driverId, location: location)
 
-        let record: [String: Any] = [
-            "order_id": orderId.uuidString,
-            "driver_id": driverId.uuidString,
-            "lat": locationUpdate.latitude,
-            "lng": locationUpdate.longitude,
-            "accuracy": locationUpdate.accuracy.map { NSDecimalNumber(decimal: $0).doubleValue }!,
-            "speed": locationUpdate.speed.map { NSDecimalNumber(decimal: $0).doubleValue }!,
-            "bearing": locationUpdate.bearing.map { NSDecimalNumber(decimal: $0).doubleValue }!,
-            "timestamp": ISO8601DateFormatter().string(from: locationUpdate.timestamp)
-        ]
-
-        let jsonData = try JSONSerialization.data(withJSONObject: record)
+        let record = LocationTrackingInsert(
+            orderId: orderId.uuidString,
+            driverId: driverId.uuidString,
+            lat: locationUpdate.latitude,
+            lng: locationUpdate.longitude,
+            accuracy: locationUpdate.accuracy.map { NSDecimalNumber(decimal: $0).doubleValue },
+            speed: locationUpdate.speed.map { NSDecimalNumber(decimal: $0).doubleValue },
+            bearing: locationUpdate.bearing.map { NSDecimalNumber(decimal: $0).doubleValue },
+            timestamp: ISO8601DateFormatter().string(from: locationUpdate.timestamp)
+        )
 
         _ = try await client
             .from(trackingTableName)
-            .insert(jsonData)
+            .insert(record)
             .execute()
 
         // 同时更新司机profile中的位置

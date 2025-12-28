@@ -114,19 +114,30 @@ final class PaymentService: PaymentServiceProtocol {
         }
 
         // 创建支付记录
-        let paymentData: [String: Any] = [
-            "order_id": orderId.uuidString,
-            "amount": NSDecimalNumber(decimal: amount).doubleValue,
-            "payment_method": method.rawValue,
-            "status": PaymentStatus.pending.rawValue
-        ]
+        struct PaymentInsert: Encodable {
+            let orderId: String
+            let amount: Double
+            let paymentMethod: String
+            let status: String
 
-        let paymentJson = try JSONSerialization.data(withJSONObject: paymentData)
+            enum CodingKeys: String, CodingKey {
+                case orderId = "order_id"
+                case amount
+                case paymentMethod = "payment_method"
+                case status
+            }
+        }
 
-        // 根据官方文档，直接使用 client.from() 而不是 client.database.from()
+        let paymentData = PaymentInsert(
+            orderId: orderId.uuidString,
+            amount: NSDecimalNumber(decimal: amount).doubleValue,
+            paymentMethod: method.rawValue,
+            status: PaymentStatus.pending.rawValue
+        )
+
         let payment: Payment = try await client
             .from(SupabaseConfig.Table.payments)
-            .insert(paymentJson)
+            .insert(paymentData)
             .select()
             .single()
             .execute()
@@ -275,23 +286,27 @@ final class PaymentService: PaymentServiceProtocol {
         status: PaymentStatus,
         transactionId: String?
     ) async throws {
-        var updates: [String: Any] = [
-            "status": status.rawValue
-        ]
+        struct PaymentStatusUpdate: Encodable {
+            let status: String
+            let transactionId: String?
+            let paidAt: String?
 
-        if let transactionId = transactionId {
-            updates["transaction_id"] = transactionId
+            enum CodingKeys: String, CodingKey {
+                case status
+                case transactionId = "transaction_id"
+                case paidAt = "paid_at"
+            }
         }
 
-        if status == .success {
-            updates["paid_at"] = ISO8601DateFormatter().string(from: Date())
-        }
-
-        let jsonData = try JSONSerialization.data(withJSONObject: updates)
+        let updates = PaymentStatusUpdate(
+            status: status.rawValue,
+            transactionId: transactionId,
+            paidAt: status == .success ? ISO8601DateFormatter().string(from: Date()) : nil
+        )
 
         _ = try await client
             .from(SupabaseConfig.Table.payments)
-            .update(jsonData)
+            .update(updates)
             .eq("id", value: paymentId.uuidString)
             .execute()
     }

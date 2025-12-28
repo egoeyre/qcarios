@@ -187,7 +187,11 @@ final class AuthService: ObservableObject, AuthServiceProtocol {
             throw AuthError.userNotFound
         }
 
-        let updates: [String: Any] = ["role": role.rawValue]
+        struct RoleUpdate: Encodable {
+            let role: String
+        }
+
+        let updates = RoleUpdate(role: role.rawValue)
         let updatedUser = try await userRepository.updateUser(id: userId, updates: updates)
         self.currentUser = updatedUser
 

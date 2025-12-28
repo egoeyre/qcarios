@@ -11,7 +11,7 @@ import Supabase
 protocol UserRepositoryProtocol {
     func getUser(id: UUID) async throws -> User
     func getCurrentUser() async throws -> User
-    func updateUser(id: UUID, updates: [String: Any]) async throws -> User
+    func updateUser<T: Encodable>(id: UUID, updates: T) async throws -> User
     func getUserByPhone(phone: String) async throws -> User?
 }
 
@@ -62,18 +62,55 @@ final class UserRepository: UserRepositoryProtocol {
 
     // MARK: - Update Operations
 
-    func updateUser(id: UUID, updates: [String: Any]) async throws -> User {
-        let jsonData = try JSONSerialization.data(withJSONObject: updates)
-
-        let response: User = try await client
+    func updateUser<T: Encodable>(id: UUID, updates: T) async throws -> User {
+        // 使用数组响应以便更好地处理错误
+        let response: [User] = try await client
             .from(tableName)
-            .update(jsonData)
+            .update(updates)
             .eq("id", value: id.uuidString)
             .select()
-            .single()
             .execute()
             .value
 
-        return response
+        guard let user = response.first else {
+            throw SupabaseClientWrapper.DatabaseError.invalidResponse
+        }
+
+        return user
+    }
+}
+
+// MARK: - Update Request Models
+extension UserRepository {
+
+    /// 用户基本信息更新请求
+    struct UserBasicInfoUpdate: Encodable {
+        let nickname: String?
+        let gender: String?
+        let avatarUrl: String?
+
+        enum CodingKeys: String, CodingKey {
+            case nickname
+            case gender
+            case avatarUrl = "avatar_url"
+        }
+    }
+
+    /// 用户实名信息更新请求
+    struct UserVerificationUpdate: Encodable {
+        let realName: String
+        let idCardNumber: String
+        let isVerified: Bool
+
+        enum CodingKeys: String, CodingKey {
+            case realName = "real_name"
+            case idCardNumber = "id_card_number"
+            case isVerified = "is_verified"
+        }
+    }
+
+    /// 用户状态更新请求
+    struct UserStatusUpdate: Encodable {
+        let status: String
     }
 }

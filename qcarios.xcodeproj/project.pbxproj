@@ -510,8 +510,8 @@
 				INFOPLIST_FILE = qcarios/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = "需要使用相机拍摄证件照片";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "需要持续获取位置以追踪行程";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "需要获取您的位置信息以提供代驾服务";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "需要持续获取您的位置以实时更新行程状态";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "需要获取您的位置以提供附近的叫车服务";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "需要访问相册选择图片";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -550,8 +550,8 @@
 				INFOPLIST_FILE = qcarios/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = "需要使用相机拍摄证件照片";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "需要持续获取位置以追踪行程";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "需要获取您的位置信息以提供代驾服务";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "需要持续获取您的位置以实时更新行程状态";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "需要获取您的位置以提供附近的叫车服务";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "需要访问相册选择图片";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

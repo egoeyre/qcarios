@@ -8,10 +8,6 @@
 	<string>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0</string>
 	<key>SUPABASE_URL</key>
 	<string>http://192.168.31.211:54321</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>需要获取您的位置以提供附近的叫车服务</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>需要持续获取您的位置以实时更新行程状态</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
