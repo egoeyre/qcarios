@@ -18,50 +18,6 @@
             endingLineNumber = "12"
             landmarkName = "SupabaseClientWrapper"
             landmarkType = "3">
-            <Locations>
-               <Location
-                  uuid = "C20EC032-C719-4ABD-A4CB-825FB3ECCF1E - 6494b319581a28e"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "qcarios.SupabaseClientWrapper.deinit"
-                  moduleName = "qcarios.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/ai/Desktop/qcarios/qcarios/Core/Database/SupabaseClient.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "0"
-                  endingLineNumber = "0">
-               </Location>
-               <Location
-                  uuid = "C20EC032-C719-4ABD-A4CB-825FB3ECCF1E - 5bbbcacace1a6d2e"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "qcarios.SupabaseClientWrapper.__isolated_deallocating_deinit"
-                  moduleName = "qcarios.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/ai/Desktop/qcarios/qcarios/Core/Database/SupabaseClient.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "0"
-                  endingLineNumber = "0">
-               </Location>
-               <Location
-                  uuid = "C20EC032-C719-4ABD-A4CB-825FB3ECCF1E - d9a1e008a480656b"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "qcarios.SupabaseClientWrapper.__deallocating_deinit"
-                  moduleName = "qcarios.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/ai/Desktop/qcarios/qcarios/Core/Database/SupabaseClient.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "0"
-                  endingLineNumber = "0">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

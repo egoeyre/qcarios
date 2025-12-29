@@ -238,35 +238,96 @@ final class AMapService: NSObject, MapServiceProtocol {
 
     /// 计算路线
     func calculateRoute(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D) async throws -> RouteInfo {
-        // 使用高德导航SDK计算路线
-        // 注意：这里简化处理，实际项目中需要集成AMapNaviKit
-        // 当前返回模拟数据，实际使用时需要替换为真实的路线规划API
+        guard let searchAPI = searchAPI else {
+            print("❌ [MapService] searchAPI 未初始化")
+            throw MapError.notConfigured
+        }
 
-        // 计算直线距离作为估算
-        let fromLocation = CLLocation(latitude: from.latitude, longitude: from.longitude)
-        let toLocation = CLLocation(latitude: to.latitude, longitude: to.longitude)
-        let straightDistance = fromLocation.distance(from: toLocation)
+        // 创建路线规划请求
+        let request = AMapDrivingCalRouteSearchRequest()
 
-        // 估算行驶距离（通常是直线距离的1.3倍）
-        let estimatedDistance = straightDistance * 1.3
-
-        // 估算行驶时间（假设平均速度40km/h）
-        let estimatedDuration = (estimatedDistance / 1000) / 40 * 3600
-
-        // 创建简单的两点连线
-        let polyline = [from, to]
-
-        return RouteInfo(
-            distance: estimatedDistance,
-            duration: estimatedDuration,
-            polyline: polyline
+        // 设置起点
+        request.origin = AMapGeoPoint.location(
+            withLatitude: CGFloat(from.latitude),
+            longitude: CGFloat(from.longitude)
         )
 
-        // TODO: 集成真实的路线规划API
-        // guard let searchAPI = searchAPI else {
-        //     throw MapError.notConfigured
-        // }
-        // 使用 AMapNaviKit 进行实际路线规划
+        // 设置终点
+        request.destination = AMapGeoPoint.location(
+            withLatitude: CGFloat(to.latitude),
+            longitude: CGFloat(to.longitude)
+        )
+
+        // 驾车导航策略（高德地图新版SDK）
+        // 32：默认，高德推荐（同高德地图APP默认）
+        // 33：躲避拥堵
+        // 34：高速优先
+        // 35：不走高速
+        // 36：避免收费
+        // 37：躲避拥堵+高速优先
+        // 38：躲避拥堵+避免收费
+        // 39：躲避拥堵+不走高速
+        // 40：躲避拥堵+高速优先+避免收费
+        request.strategy = 32 // 使用高德推荐策略，适合代驾场景
+
+        // 🔑 关键：设置返回字段，必须包含polyline才能获取详细路线坐标
+        // 设置showFieldType来请求polyline数据
+        request.showFieldType = AMapDrivingRouteShowFieldType(
+            rawValue: AMapDrivingRouteShowFieldType.cost.rawValue |
+                      AMapDrivingRouteShowFieldType.tmcs.rawValue |
+                      AMapDrivingRouteShowFieldType.navi.rawValue |
+                      AMapDrivingRouteShowFieldType.cities.rawValue |
+                      AMapDrivingRouteShowFieldType.polyline.rawValue
+        )!
+
+        return try await withCheckedThrowingContinuation { continuation in
+            self.searchContinuation = continuation
+            searchAPI.aMapDrivingV2RouteSearch(request)
+        }
+        .flatMap { result -> RouteInfo in
+            guard let routeResult = result as? AMapRouteSearchResponse else {
+                print("❌ [MapService] 响应类型错误")
+                throw MapError.routeNotFound
+            }
+
+            guard let route = routeResult.route else {
+                print("❌ [MapService] route 为 nil")
+                throw MapError.routeNotFound
+            }
+
+            guard let path = route.paths.first else {
+                print("❌ [MapService] paths 为空")
+                throw MapError.routeNotFound
+            }
+
+            // 解析路线坐标点
+            var polylineCoordinates: [CLLocationCoordinate2D] = []
+
+            // 方法1: 尝试从 path.polyline 获取（整体路线）
+            if let pathPolyline = path.polyline {
+                polylineCoordinates = self.decodePolyline(pathPolyline)
+            }
+            // 方法2: 如果 path.polyline 为空，尝试从各个 step 拼接
+            else {
+                for step in path.steps {
+                    if let polyline = step.polyline {
+                        polylineCoordinates.append(contentsOf: self.decodePolyline(polyline))
+                    }
+                }
+            }
+
+            // 如果没有详细路线点，至少返回起终点连线
+            if polylineCoordinates.isEmpty {
+                print("⚠️ [MapService] 无详细路线，使用起终点连线")
+                polylineCoordinates = [from, to]
+            }
+
+            return RouteInfo(
+                distance: Double(path.distance),
+                duration: TimeInterval(path.duration),
+                polyline: polylineCoordinates
+            )
+        }
     }
 
     // MARK: - Helper Methods

@@ -76,14 +76,18 @@ final class PassengerHomeViewModel: ObservableObject {
     }
 
     func calculateRoute() {
-        guard let pickup = pickupLocation,
-              let destination = selectedDestination else {
+        guard let pickup = pickupLocation else {
+            print("❌ pickupLocation 为 nil")
+            return
+        }
+
+        guard let destination = selectedDestination else {
+            print("❌ selectedDestination 为 nil")
             return
         }
 
         Task {
             do {
-                // 计算路线
                 let route = try await mapService.calculateRoute(
                     from: pickup,
                     to: destination.location
@@ -100,7 +104,7 @@ final class PassengerHomeViewModel: ObservableObject {
                 await calculatePrice(route: route)
 
             } catch {
-                print("❌ 计算路线失败: \(error)")
+                print("❌ 计算路线失败: \(error.localizedDescription)")
             }
         }
     }

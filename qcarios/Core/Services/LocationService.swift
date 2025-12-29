@@ -33,6 +33,12 @@ final class LocationService: NSObject, LocationServiceProtocol {
     @Published private(set) var currentLocation: CLLocation?
     @Published private(set) var authorizationStatus: CLAuthorizationStatus
 
+    // 位置更新优化
+    private var lastPublishedLocation: CLLocation?
+    private var lastPublishTime: Date?
+    private let minimumUpdateInterval: TimeInterval = 3.0 // 最小更新间隔3秒
+    private let minimumDistance: CLLocationDistance = 10.0 // 最小移动距离10米
+
     var locationPublisher: AnyPublisher<CLLocation, Never> {
         locationSubject.eraseToAnyPublisher()
     }
@@ -50,7 +56,7 @@ final class LocationService: NSObject, LocationServiceProtocol {
     private func configureLocationManager() {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.distanceFilter = 10 // 10米更新一次
+        locationManager.distanceFilter = kCLDistanceFilterNone // 让系统提供所有更新，我们自己过滤
         locationManager.activityType = .automotiveNavigation
         locationManager.allowsBackgroundLocationUpdates = true
         locationManager.pausesLocationUpdatesAutomatically = false
@@ -90,6 +96,11 @@ extension LocationService: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
 
+        // 过滤低精度的位置
+        guard location.horizontalAccuracy >= 0 && location.horizontalAccuracy <= 100 else {
+            return // 忽略精度差于100米的位置
+        }
+
         // 将 WGS-84 坐标转换为 GCJ-02（高德地图坐标系）
         let wgsCoordinate = location.coordinate
         let gcjCoordinate = CoordinateConverter.wgs84ToGcj02(wgsCoordinate)
@@ -103,17 +114,45 @@ extension LocationService: CLLocationManagerDelegate {
             timestamp: location.timestamp
         )
 
-        #if DEBUG
-        print("📍 位置更新:")
-        print("   [WGS-84] 经度: \(wgsCoordinate.longitude), 纬度: \(wgsCoordinate.latitude)")
-        print("   [GCJ-02] 经度: \(gcjCoordinate.longitude), 纬度: \(gcjCoordinate.latitude)")
-        print("   偏移: Δ经度: \(gcjCoordinate.longitude - wgsCoordinate.longitude), Δ纬度: \(gcjCoordinate.latitude - wgsCoordinate.latitude)")
-        print("   精度: \(location.horizontalAccuracy)m")
-        print("   时间: \(location.timestamp)")
-        #endif
+        // 智能过滤：避免频繁更新
+        let shouldPublish = shouldPublishLocation(convertedLocation)
 
-        currentLocation = convertedLocation
-        locationSubject.send(convertedLocation)
+        if shouldPublish {
+            #if DEBUG
+            print("📍 位置更新: (\(String(format: "%.6f", gcjCoordinate.latitude)), \(String(format: "%.6f", gcjCoordinate.longitude))) 精度:\(Int(location.horizontalAccuracy))m")
+            #endif
+
+            currentLocation = convertedLocation
+            locationSubject.send(convertedLocation)
+
+            lastPublishedLocation = convertedLocation
+            lastPublishTime = Date()
+        }
+    }
+
+    // MARK: - Helper Methods
+
+    /// 判断是否应该发布位置更新
+    private func shouldPublishLocation(_ newLocation: CLLocation) -> Bool {
+        // 如果是第一次更新，直接发布
+        guard let lastLocation = lastPublishedLocation,
+              let lastTime = lastPublishTime else {
+            return true
+        }
+
+        // 检查时间间隔
+        let timeSinceLastUpdate = Date().timeIntervalSince(lastTime)
+        if timeSinceLastUpdate < minimumUpdateInterval {
+            return false // 更新太频繁，跳过
+        }
+
+        // 检查移动距离
+        let distance = newLocation.distance(from: lastLocation)
+        if distance < minimumDistance {
+            return false // 移动距离太小，跳过
+        }
+
+        return true
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
